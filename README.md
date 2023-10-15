@@ -206,5 +206,75 @@ flatpak is for software installation using discover
 ```bash
 pacman -S konsole dolphin flatpak
 ```
+---
 </details>
 
+<details><summary><b>DWM</b></summary>
+
+### Installing DWM
+
+Mandatory packages  
+`sudo paru -S xorg-server xorg-xinit xorg-xrandr xorg-xsetroot picom dmenu`
+
+Copy the xinit file to your home home directory  
+`cp /etc/X11/xinit/xinitrc ~/.xinitrc`
+
+Edit xinit file for startup  
+`nano ~/.xinitrc`
+
+  Remove following lines
+```
+twm &
+xclock -geometry 50x50-1+1 &
+xterm -geometry 80x50+494+51 &
+xterm -geometry 80x20+494-0 &
+exec xterm -geometry 80x66+0+0 -name login
+```
+  Add following lines
+```
+# keyboard layout
+setxkbmap en &
+
+# Display resolution
+xrandr --output Virtual-1 --mode 1920x1080 &
+
+# Compositor
+picom -f &
+
+# execute DWM
+exec dwm
+```
+`startx` to enter dwm  
+
+### Automaticly call startx
+`nano ~/.bash_profile`
+Add following code at the end of the file 
+```
+if [ -z "${DISPLAY}" ] && [ "${XDG_VTNR}" -eq 1 ]; then
+  exec startx
+fi
+```
+
+### Enable Wifi support
+`paru -s networkmanager-dmenu-bluetoothfix-git`
+
+open `networkmanager_dmenu` using dmenu
+
+### Enable Sound
+`paru pulseaudio`
+`paru pamixer`
+
+Add pulseaudio to xinit  
+`nano ~/.xinitrc`  
+
+Add `pulseaudio --start &` before `exec dwm`
+
+You can change/unmute volume through pamixer command
+Or you can patch DWM to use a hotkey patch
+
+### Enable numlock on start
+`paru numlockx`
+`nano ~/.xinitrc`
+
+Add `numlockx &` before `exec dwm`
+</details>
