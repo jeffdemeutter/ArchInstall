@@ -1,7 +1,5 @@
 # Arch Install
 
-## Table of contents
-
 ## Pre-chroot
 
 Update system clock:
@@ -13,15 +11,12 @@ Setup partitioning:
 ```sh
 fdisk -l
 ```
-Look for the model of disk you want to install the OS on
-Write the the disk down. Common names used are /dev/sdX or /dev/nvme0nX. Where X should be replaced with the disk letter
+Look for the model of disk you want to install the OS on, remember that disk. Common names used are /dev/sdX or /dev/nvme0nX. Where X should be replaced with the disk letter
 
 Example used: /dev/nvme0n1. Replace with corresponding disk
 
 ```sh
-
-
-fdisk /dev/nvme0n1
+gdisk /dev/nvme0n1
 
 # the following commands are ran inside fdisk
 # delete existing partitions with, run the d command until you have no partitions left
@@ -32,37 +27,35 @@ d
 n
 => default = 1
 => default
-# EFI partition can be between 500M and 1 G
-=> +800M
+=> +1G
+=> EF00
 
 # create a swap partition
 n
 => default = 2
 => default
-=> +32G # take the size of your RAM or half of it
+=> +16G # take the size of your RAM or half of it
+=> default
 
 # partition for our Linux system
 n
 => default = 3
 => default
 => default
-
-# Set the type of our first partition to EFI
-t
-=> 1
+=> default
 
 # Write changes  --IMPORTANT--
 w
 ```
 
-assuming your disk name is /dev/nvme0n1
+Assuming your disk name is /dev/nvme0n1  
 Format Partitions:
 ```bash
 mkfs.ext4 /dev/nvme0n1p3
 
-mkswap /dev/nvme0n1p2
-
 mkfs.fat -F 32 /dev/nvme0n1p1
+
+mkswap /dev/nvme0n1p2
 ```
 
 Mount partitions
@@ -75,13 +68,17 @@ mount /dev/nvme0n1p1 /mnt/boot
 swapon /dev/nvme0n1p2
 ```
 
+Install nano
+```sh
+pacman -S nano
+```
+
 Before we can go onto installing our system we'll enable some things that'll make our downloads faster.
 ```bash
 nano /etc/pacman.conf
 
-...
-ParallelDownloads 20
-...
+# uncomment and change to a higher number
+ParallelDownloads = 20
 ```
 
 Install base system and kernel
@@ -99,7 +96,7 @@ Enter our very basic install:
 arch-chroot /mnt
 ```
 
-## Inside our chroot
+## Inside chroot
 
 Set our timezone
 ```bash
@@ -119,7 +116,6 @@ nano /etc/locale.gen
 
 # uncomment accordingly
 en_US.UTF-8
-nl_BE.UTF-8
 ```
 
 ```bash
@@ -137,13 +133,13 @@ nano /etc/hostname
 sapphire
 ```
 
-### Setup Users
 Set our root password:
 ```
 passwd
 ```
 
-Create a normal user DO NOT FORGET -m :
+### Setup Users
+Create a normal user DO NOT FORGET `-m`:
 ```bash
 useradd -m username
 ```
@@ -153,66 +149,35 @@ Set the password for our new user
 passwd username
 ```
 
-### Installing boot loader
-
-## `OPTION 1: REFIND (NOT RECOMMENDED)`
-```bash
-pacman -S refind
-```
-
-```bash
-refind-install
-```
-
-Install micro-code patches for your CPU:
-```bash
-pacman -S amd-ucode
-# or
-pacman -S intel-ucode
-```
-
-Log fstab:
-```bash
-cat /etc/fstab
-
-=>
-
-# Static information about the filesystems.
-# See fstab(5) for details.
-
-# <file system> <dir> <type> <options> <dump> <pass>
-# /dev/nvme0n1p3
-UUID=a9d51ea5-3fab-4c85-9e35-18dfe25fad02       /               ext4            rw,relatime     0 1
-
-# /dev/nvme0n1p1
-UUID=7A00-2C23          /boot           vfat            rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro   0 2
-
-# /dev/nvme0n1p2
-UUID=98850be0-6397-408a-8a16-cbae126a9486       none            swap            defaults        0 0
-```
-
-Take note of the partition with `UUID=a9d51ea5-3fab-4c85-9e35-18dfe25fad02`, this UUID will be different for your system but make sure you take note of this as we'll need it for our refind_linux.conf.
-
-#### Fixing Refind
-
-```bash
-nano /boot/refind_linux.conf
-```
-
-Make sure what you find in this file looks about the same as the below content, replace the UUID with the one you took note of previously.
-```text
-"Boot with standard options"  "root=UUID=a9d51ea5-3fab-4c85-9e35-18dfe25fad02 rw initrd=amd-ucode.img initrd=initramfs-linux.img"
-"Boot to single-user mode"    "root=UUID=a9d51ea5-3fab-4c85-9e35-18dfe25fad02 single"
-"Boot with minimal options"   "ro root=/dev/nvme0n1p3"
-```
-Also replace `amd-ucode` with `intel-ucode` if you have an intel CPU.
-
-## `OPTION 2: bootctl (RECOMMENDED)`
-
+## Installing boot loader
+### bootctl
 ```bash
 bootctl install
 ```
+### add Arch entry  
+`nano /boot/loadeer/entries/arch.conf`
+```sh
+title   Arch Linux
+linux   /vmlinuz-linux
+initrd  /initramfs-linux.img
+options root=/dev/nvme0n1p3 #this can be different depending on your specific install
+```
 
+### networkmanager
+```sh
+pacman -S networkManager
+systemctl enable NetworkManager
+```
+### sudo
+```sh
+pacman -S sudo
+groupadd sudo
+usermod -aG sudo sapphire
+nano /etc/sudoers
+# => uncomment users in sudo group can use sudo
+```
+
+## Installing A Desktop Environment
 ### Installing KDE plasma
 `important` use plasma-desktop if you want a basic set of utilities like text editor, calculator, file explorer,....
 ```bash
