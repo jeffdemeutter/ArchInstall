@@ -186,7 +186,10 @@ reboot
 ```
 
 ## Installing A Desktop Environment
+<details><summary><b>KDE plasma</b></summary>
+  
 ### Installing KDE plasma
+
 `important` use plasma-desktop if you want a basic set of utilities like text editor, calculator, file explorer,....
 ```bash
 pacman -S xorg-server plasma-meta
@@ -203,4 +206,5 @@ flatpak is for software installation using discover
 ```bash
 pacman -S konsole dolphin flatpak
 ```
+</details>
 
