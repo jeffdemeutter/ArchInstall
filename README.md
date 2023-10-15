@@ -155,7 +155,7 @@ passwd username
 bootctl install
 ```
 ### add Arch entry  
-`nano /boot/loadeer/entries/arch.conf`
+`nano /boot/loader/entries/arch.conf`
 ```sh
 title   Arch Linux
 linux   /vmlinuz-linux
