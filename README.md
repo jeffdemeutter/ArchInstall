@@ -216,12 +216,6 @@ pacman -S konsole dolphin flatpak
 Mandatory packages  
 `sudo paru -S xorg-server xorg-xinit xorg-xrandr xorg-xsetroot picom dmenu`
 
-Install DWM package
-```sh
-git clone https://github.com/sr/dwm.git
-cd dwm
-sudo make clean install
-```
 
 Copy the xinit file to your home home directory  
 `cp /etc/X11/xinit/xinitrc ~/.xinitrc`
