@@ -254,7 +254,7 @@ exec dwm
 `startx` to enter dwm  
 
 ### Automaticly call startx
-`nano ~/.bash_profile`
+`nano ~/.bash_profile`  
 Add following code at the end of the file 
 ```
 if [ -z "${DISPLAY}" ] && [ "${XDG_VTNR}" -eq 1 ]; then
