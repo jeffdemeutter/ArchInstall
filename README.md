@@ -274,7 +274,7 @@ You can change/unmute volume through pamixer command
 Or you can patch DWM to use a hotkey patch
 
 ### Enable numlock on start
-`paru numlockx`
+`paru numlockx`  
 `nano ~/.xinitrc`
 
 Add `numlockx &` before `exec dwm`
