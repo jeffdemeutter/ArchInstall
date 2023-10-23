@@ -263,6 +263,7 @@ open `networkmanager_dmenu` using dmenu
 
 ### Enable Sound
 `paru pulseaudio`
+`paru pulseaudio-alsa`
 `paru pamixer`
 
 Add pulseaudio to xinit  
