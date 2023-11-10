@@ -279,4 +279,21 @@ Or you can patch DWM to use a hotkey patch
 `nano ~/.xinitrc`
 
 Add `numlockx &` before `exec dwm`
+
+### Inverted scrolling
+`paru xorg-xinput`  
+`paru libinput`  
+`sudo nano /etc/X11/xorg.conf.d/40-libinput.conf`  
+Copy this code into that file
+``` 
+Section "InputClass"
+    Identifier "libinput touchpad catchall"
+    MatchIsTouchpad "on"
+    MatchDevicePath "/dev/input/event*"
+    Option "NaturalScrolling" "true"
+EndSection
+```
+Restart your pc
+
+
 </details>
